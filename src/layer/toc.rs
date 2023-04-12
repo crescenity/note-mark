@@ -70,7 +70,11 @@ impl MakeToc {
             } else {
                 let mut index = 1;
 
-                while set.insert(text.clone() + &index.to_string()) {
+                loop {
+                    if set.insert(text.clone() + &index.to_string()) {
+                        break;
+                    }
+
                     index += 1;
                 }
 
@@ -109,7 +113,7 @@ impl MakeToc {
                         tag: ElementTag::Li,
                         children: vec![Node::Element(ElementNode {
                             tag: ElementTag::A,
-                            href: Some(rest[0].2.clone()),
+                            href: Some(String::from("#") + &rest[0].2),
                             children: vec![Node::Text(TextNode {
                                 text: rest[0].1.clone().into(),
                             })],
@@ -122,7 +126,7 @@ impl MakeToc {
 
                     let mut list = vec![Node::Element(ElementNode {
                         tag: ElementTag::A,
-                        href: Some(rest[0].2.clone()),
+                        href: Some(String::from("#") + &rest[0].2),
                         children: vec![Node::Text(TextNode {
                             text: rest[0].1.clone().into(),
                         })],
@@ -150,6 +154,7 @@ impl MakeToc {
 
                 let mut list = vec![Node::Element(ElementNode {
                     tag: ElementTag::A,
+                    href: Some(String::from("#") + &rest[0].2),
                     children: vec![Node::Text(TextNode {
                         text: rest[0].1.clone().into(),
                     })],
@@ -185,10 +190,10 @@ mod tests {
 
     #[test]
     fn test_make_toc() {
-        let input = "# H1AAAAAA\n\n# H1BBBBBB\n\n## H2AAAAAA\n\n## H2BBBBBB\n\n# H1CCCCCC\n\n";
+        let input =
+            "# H1AAAAAA\n\n# H1AAAAAA\n\n# H1BBBBBB\n\n## H2AAAAAA\n\n## H2BBBBBB\n\n# H1CCCCCC\n\n";
 
-        let markdown =
-            Markdown::default().stringifier(Stringifier::default().format(true).width(10));
+        let markdown = Markdown::default().stringifier(Stringifier::default());
 
         let tokens = Markdown::lex(input);
         let tree = markdown.parser.parse(input, tokens);
@@ -198,10 +203,10 @@ mod tests {
 
         let output1 = markdown.stringifier.stringify(document);
 
-        println!("{output1}");
+        assert_eq!(output1, "<h1 id=\"H1AAAAAA\">H1AAAAAA</h1><h1 id=\"H1AAAAAA1\">H1AAAAAA</h1><h1 id=\"H1BBBBBB\">H1BBBBBB</h1><h2 id=\"H2AAAAAA\">H2AAAAAA</h2><h2 id=\"H2BBBBBB\">H2BBBBBB</h2><h1 id=\"H1CCCCCC\">H1CCCCCC</h1>");
 
         let output2 = markdown.stringifier.stringify(toc);
 
-        println!("{output2}");
+        assert_eq!(output2, "<ul><li><a href=\"#H1AAAAAA\">H1AAAAAA</a></li><li><a href=\"#H1AAAAAA1\">H1AAAAAA</a></li><li><a href=\"#H1BBBBBB\">H1BBBBBB</a><ul><li><a href=\"#H2AAAAAA\">H2AAAAAA</a></li><li><a href=\"#H2BBBBBB\">H2BBBBBB</a></li></ul></li><li><a href=\"#H1CCCCCC\">H1CCCCCC</a></li></ul>")
     }
 }
