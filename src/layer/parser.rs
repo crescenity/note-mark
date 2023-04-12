@@ -23,6 +23,7 @@ pub mod config {
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum HeadlineEnding {
         SoftBreak,
+        AllowSoftBreak,
         HardBreak,
     }
 
@@ -435,6 +436,14 @@ impl<'a, 'b> Executor<'a> {
         match self.config.headline_ending {
             HeadlineEnding::SoftBreak => {
                 let (input, rest) = Self::get_line(content, true);
+
+                Some((
+                    BlockItem::Headline(level as u8, self.inline_tree(input)),
+                    rest,
+                ))
+            }
+            HeadlineEnding::AllowSoftBreak => {
+                let (input, rest) = self.get_until_maybe_block_item(content);
 
                 Some((
                     BlockItem::Headline(level as u8, self.inline_tree(input)),
@@ -960,6 +969,42 @@ mod tests {
         );
 
         assert_eq!(rest.len(), 0);
+    }
+
+    #[test]
+    fn test_headline2() {
+        let input = "# Hello World!\n# Goodbye\n";
+        let tokens = lex_to_vec(input);
+        let parser = Executor::new(input);
+
+        let (item, _) = parser.headline(&tokens).unwrap();
+
+        assert_ne!(
+            item,
+            BlockItem::Headline(
+                1,
+                InlineTree {
+                    root: vec![InlineItem::Text("Hello World!".into())]
+                }
+            )
+        );
+
+        let parser = Executor::with_config(
+            input,
+            Parser::default().headline_ending(HeadlineEnding::AllowSoftBreak),
+        );
+
+        let (item, _) = parser.headline(&tokens).unwrap();
+
+        assert_eq!(
+            item,
+            BlockItem::Headline(
+                1,
+                InlineTree {
+                    root: vec![InlineItem::Text("Hello World!".into())]
+                }
+            )
+        );
     }
 
     #[test]
