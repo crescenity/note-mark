@@ -1,0 +1,13 @@
+- 目次も作れるようにする。
+  - 本文のh1タグなどにidを入れる。
+  - 目次のHTML木構造を作る。aタグにhref="#{$id}"をつける。
+  - idはHash化する？
+  - `fn(&mut DocumentNode) -> DocumentNode`。自身にidを付けつつ、目次の`DocumentNode`を作る。
+- \_hoge\_などの記法にも対応。
+- コンテナ記法
+  - details。:::details \[summary\] ...
+  - div or aside
+  - 開始位置と終了位置の判別方法(ネスト対応)。
+- テーブル記法
+- コードブロック \`\`\` xxx \`\`\`
+- インラインコード \`x\`
