@@ -53,45 +53,40 @@ impl Transformer {
     fn paragraph<'a>(&self, tree: InlineTree<'a>) -> Node<'a> {
         Node::Element(ElementNode {
             tag: ElementTag::P,
-            id: vec![],
-            class: vec![],
             children: self.inline_tree(tree),
+            ..Default::default()
         })
     }
 
     fn headline<'a>(&self, level: u8, tree: InlineTree<'a>) -> Node<'a> {
         Node::Element(ElementNode {
             tag: ElementTag::headline(level).unwrap(),
-            id: vec![],
-            class: vec![],
             children: self.inline_tree(tree),
+            ..Default::default()
         })
     }
 
     fn bullet_list<'a>(&self, tree: ListTree<'a>) -> Node<'a> {
         Node::Element(ElementNode {
             tag: ElementTag::Ul,
-            id: vec![],
-            class: vec![],
             children: self.list_tree(tree),
+            ..Default::default()
         })
     }
 
     fn ordered_list<'a>(&self, tree: ListTree<'a>) -> Node<'a> {
         Node::Element(ElementNode {
             tag: ElementTag::Ol,
-            id: vec![],
-            class: vec![],
             children: self.list_tree(tree),
+            ..Default::default()
         })
     }
 
     fn blockquote<'a>(&self, tree: BlockTree<'a>) -> Node<'a> {
         Node::Element(ElementNode {
             tag: ElementTag::Blockquote,
-            id: vec![],
-            class: vec![],
             children: self.block_tree(tree),
+            ..Default::default()
         })
     }
 
@@ -108,9 +103,8 @@ impl Transformer {
 
                 Node::Element(ElementNode {
                     tag: ElementTag::Li,
-                    id: vec![],
-                    class: vec![],
                     children: nodes,
+                    ..Default::default()
                 })
             })
             .collect()
@@ -139,27 +133,23 @@ impl Transformer {
     fn italic<'a>(&self, tree: InlineTree<'a>) -> Node<'a> {
         Node::Element(ElementNode {
             tag: ElementTag::Em,
-            id: vec![],
-            class: vec![],
             children: self.inline_tree(tree),
+            ..Default::default()
         })
     }
 
     fn strong<'a>(&self, tree: InlineTree<'a>) -> Node<'a> {
         Node::Element(ElementNode {
             tag: ElementTag::Strong,
-            id: vec![],
-            class: vec![],
             children: self.inline_tree(tree),
+            ..Default::default()
         })
     }
 
     fn r#break<'a>(&self) -> Node<'a> {
         Node::Element(ElementNode {
             tag: ElementTag::Br,
-            id: vec![],
-            class: vec![],
-            children: vec![],
+            ..Default::default()
         })
     }
 }
@@ -205,35 +195,30 @@ mod tests {
                 root: vec![
                     Node::Element(ElementNode {
                         tag: ElementTag::H1,
-                        id: vec![],
-                        class: vec![],
                         children: vec![
                             Node::Text(TextNode {
                                 text: Cow::Borrowed("Hello")
                             }),
                             Node::Element(ElementNode {
                                 tag: ElementTag::Br,
-                                id: vec![],
-                                class: vec![],
-                                children: vec![]
+                                ..Default::default()
                             }),
                             Node::Text(TextNode {
                                 text: Cow::Borrowed("World")
                             }),
-                        ]
+                        ],
+                        ..Default::default()
                     }),
                     Node::Element(ElementNode {
                         tag: ElementTag::P,
-                        id: vec![],
-                        class: vec![],
                         children: vec![Node::Element(ElementNode {
                             tag: ElementTag::Strong,
-                            id: vec![],
-                            class: vec![],
                             children: vec![Node::Text(TextNode {
                                 text: Cow::Borrowed("Hello World2")
                             })],
-                        }),]
+                            ..Default::default()
+                        }),],
+                        ..Default::default()
                     }),
                 ]
             }
@@ -319,91 +304,79 @@ mod tests {
             DocumentNode {
                 root: vec![Node::Element(ElementNode {
                     tag: ElementTag::Ul,
-                    id: vec![],
-                    class: vec![],
                     children: vec![
                         Node::Element(ElementNode {
                             tag: ElementTag::Li,
-                            id: vec![],
-                            class: vec![],
                             children: vec![Node::Text(TextNode {
                                 text: Cow::Borrowed("Hello")
-                            }),]
+                            }),],
+                            ..Default::default()
                         }),
                         Node::Element(ElementNode {
                             tag: ElementTag::Li,
-                            id: vec![],
-                            class: vec![],
                             children: vec![
                                 Node::Text(TextNode {
                                     text: Cow::Borrowed("World")
                                 }),
                                 Node::Element(ElementNode {
                                     tag: ElementTag::Ol,
-                                    id: vec![],
-                                    class: vec![],
                                     children: vec![
                                         Node::Element(ElementNode {
                                             tag: ElementTag::Li,
-                                            id: vec![],
-                                            class: vec![],
                                             children: vec![Node::Text(TextNode {
                                                 text: Cow::Borrowed("Change the ")
-                                            }),]
+                                            }),],
+                                            ..Default::default()
                                         }),
                                         Node::Element(ElementNode {
                                             tag: ElementTag::Li,
-                                            id: vec![],
-                                            class: vec![],
                                             children: vec![Node::Element(ElementNode {
                                                 tag: ElementTag::Strong,
-                                                id: vec![],
-                                                class: vec![],
                                                 children: vec![Node::Text(TextNode {
                                                     text: Cow::Borrowed("world")
-                                                }),]
-                                            }),]
+                                                }),],
+                                                ..Default::default()
+                                            }),],
+                                            ..Default::default()
                                         }),
                                         Node::Element(ElementNode {
                                             tag: ElementTag::Li,
-                                            id: vec![],
-                                            class: vec![],
                                             children: vec![
                                                 Node::Text(TextNode {
                                                     text: Cow::Borrowed("OK")
                                                 }),
                                                 Node::Element(ElementNode {
                                                     tag: ElementTag::Br,
-                                                    id: vec![],
-                                                    class: vec![],
-                                                    children: vec![]
+                                                    ..Default::default()
                                                 }),
                                                 Node::Text(TextNode {
                                                     text: Cow::Borrowed("Good")
                                                 }),
-                                            ]
+                                            ],
+                                            ..Default::default()
                                         }),
-                                    ]
+                                    ],
+                                    ..Default::default()
                                 }),
                                 Node::Element(ElementNode {
                                     tag: ElementTag::P,
-                                    id: vec![],
-                                    class: vec![],
                                     children: vec![Node::Text(TextNode {
                                         text: Cow::Borrowed("OK")
-                                    }),]
+                                    }),],
+                                    ..Default::default()
                                 }),
-                            ]
+                            ],
+                            ..Default::default()
                         }),
                         Node::Element(ElementNode {
                             tag: ElementTag::Li,
-                            id: vec![],
-                            class: vec![],
                             children: vec![Node::Text(TextNode {
                                 text: Cow::Borrowed("Hello2")
-                            }),]
+                            }),],
+                            ..Default::default()
                         }),
-                    ]
+                    ],
+                    ..Default::default()
                 }),]
             }
         )
