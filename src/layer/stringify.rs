@@ -46,6 +46,7 @@ fn tag_to_str(tag: ElementTag) -> &'static str {
         ElementTag::Ol => "ol",
         ElementTag::Li => "li",
         ElementTag::Blockquote => "blockquote",
+        ElementTag::A => "a",
         ElementTag::Strong => "strong",
         ElementTag::Em => "em",
         ElementTag::Br => "br",

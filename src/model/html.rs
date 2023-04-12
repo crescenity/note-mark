@@ -20,6 +20,7 @@ pub enum ElementTag {
     Ol,
     Li,
     Blockquote,
+    A,
     Strong,
     Em,
     Br,
