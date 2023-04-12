@@ -34,6 +34,10 @@ impl Markdown {
 }
 
 impl Markdown {
+    pub fn lex(input: &str) -> impl Iterator<Item = model::token::Token> + '_ {
+        lex(input)
+    }
+
     pub fn execute(&self, input: &str) -> String {
         let tokens = lex(input);
         let tree = self.parser.parse(input, tokens);
