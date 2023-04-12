@@ -10,7 +10,7 @@ impl Default for Stringifier {
     fn default() -> Self {
         Self {
             format: false,
-            width: 100,
+            width: 20,
         }
     }
 }
@@ -85,6 +85,38 @@ impl Stringifier {
         match element.tag {
             ElementTag::Br => format!("<{tag}>"),
             _ => {
+                let class = if !element.class.is_empty() {
+                    format!(
+                        " class=\"{}\"",
+                        element.class.into_iter().collect::<Vec<_>>().join(" ")
+                    )
+                } else {
+                    String::new()
+                };
+
+                let id = if !element.id.is_empty() {
+                    format!(
+                        " id=\"{}\"",
+                        element.id.into_iter().collect::<Vec<_>>().join(" ")
+                    )
+                } else {
+                    String::new()
+                };
+
+                let href = if let Some(href) = element.href {
+                    format!(" href=\"{href}\"")
+                } else {
+                    String::new()
+                };
+
+                let attrs = element
+                    .attrs
+                    .iter()
+                    .map(|(name, value)| format!(" {name}=\"{value}\""))
+                    .collect::<String>();
+
+                let attrs = format!("{class}{id}{href}{attrs}");
+
                 if self.format {
                     if element.children.len() == 1 {
                         let children = self.stringify_node(element.children[0].clone());
@@ -95,9 +127,9 @@ impl Stringifier {
                                 .map(|line| String::from("    ") + line)
                                 .collect::<Vec<_>>()
                                 .join("\n");
-                            format!("\n<{tag}>\n{children}\n</{tag}>\n")
+                            format!("\n<{tag}{attrs}>\n{children}\n</{tag}>\n")
                         } else {
-                            format!("<{tag}>{children}</{tag}>")
+                            format!("<{tag}{attrs}>{children}</{tag}>")
                         }
                     } else if element
                         .children
@@ -113,7 +145,7 @@ impl Stringifier {
                             .collect::<Vec<_>>()
                             .join("");
 
-                        format!("<{tag}>{children}</{tag}>")
+                        format!("<{tag}{attrs}>{children}</{tag}>")
                     } else {
                         let children = element
                             .children
@@ -126,7 +158,7 @@ impl Stringifier {
                             .collect::<Vec<_>>()
                             .join("\n");
 
-                        format!("<{tag}>\n{children}\n</{tag}>")
+                        format!("<{tag}{attrs}>\n{children}\n</{tag}>")
                     }
                 } else {
                     let children = element
@@ -136,7 +168,7 @@ impl Stringifier {
                         .collect::<Vec<_>>()
                         .join("");
 
-                    format!("<{tag}>{children}</{tag}>")
+                    format!("<{tag}{attrs}>{children}</{tag}>")
                 }
             }
         }
@@ -208,6 +240,33 @@ mod tests {
         assert_eq!(
             stringifier.stringify(document),
             "<p>Hello, <strong>world</strong>!<br>Hello, <strong>world</strong>!</p>".to_string()
+        );
+    }
+
+    #[test]
+    fn test_stringify_attrs() {
+        let document = DocumentNode {
+            root: vec![Node::Element(ElementNode {
+                tag: ElementTag::P,
+                class: vec!["test".into(), "test2".into()],
+                id: vec!["ttt".into()],
+                href: Some("https://example.com".into()),
+                attrs: vec![
+                    ("data-test".into(), "ok".into()),
+                    ("data-test2".into(), "ok2".into()),
+                ],
+                children: vec![Node::Text(TextNode {
+                    text: "Hello, world!".into(),
+                })],
+                ..Default::default()
+            })],
+        };
+
+        let stringifier = Stringifier::new();
+
+        assert_eq!(
+            stringifier.stringify(document),
+            "<p class=\"test test2\" id=\"ttt\" href=\"https://example.com\" data-test=\"ok\" data-test2=\"ok2\">Hello, world!</p>".to_string()
         );
     }
 }
