@@ -65,8 +65,8 @@ impl MakeToc {
 
             let text = get_text(&element.children);
 
-            let id = if set.insert(text.clone()) {
-                text
+            let (text, id) = if set.insert(text.clone()) {
+                (text.clone(), text)
             } else {
                 let mut index = 1;
 
@@ -74,10 +74,12 @@ impl MakeToc {
                     index += 1;
                 }
 
-                text + &index.to_string()
+                (text.clone(), text + &index.to_string())
             };
 
-            list.push((headline_level, id));
+            element.id.push(id.clone());
+
+            list.push((headline_level, text, id));
         }
 
         let output = self.nest(&list);
@@ -91,13 +93,15 @@ impl MakeToc {
         DocumentNode { root: vec![list] }
     }
 
-    fn nest(&self, rest: &[(u8, String)]) -> Vec<Node<'static>> {
+    fn nest(&self, rest: &[(u8, String, String)]) -> Vec<Node<'static>> {
         let mut rest = rest;
 
         let mut children = vec![];
 
         while !rest.is_empty() {
-            let next = rest[1..].iter().position(|(level, _)| *level >= rest[0].0);
+            let next = rest[1..]
+                .iter()
+                .position(|(level, _, _)| *level <= rest[0].0);
 
             if let Some(index) = next {
                 if index == 1 {
@@ -105,6 +109,7 @@ impl MakeToc {
                         tag: ElementTag::Li,
                         children: vec![Node::Element(ElementNode {
                             tag: ElementTag::A,
+                            href: Some(rest[0].2.clone()),
                             children: vec![Node::Text(TextNode {
                                 text: rest[0].1.clone().into(),
                             })],
@@ -115,22 +120,26 @@ impl MakeToc {
                 } else {
                     let output = self.nest(&rest[1..index + 1]);
 
+                    let mut list = vec![Node::Element(ElementNode {
+                        tag: ElementTag::A,
+                        href: Some(rest[0].2.clone()),
+                        children: vec![Node::Text(TextNode {
+                            text: rest[0].1.clone().into(),
+                        })],
+                        ..Default::default()
+                    })];
+
+                    if !output.is_empty() {
+                        list.push(Node::Element(ElementNode {
+                            tag: self.list_type.to_tag(),
+                            children: output,
+                            ..Default::default()
+                        }));
+                    }
+
                     children.push(Node::Element(ElementNode {
                         tag: ElementTag::Li,
-                        children: vec![
-                            Node::Element(ElementNode {
-                                tag: ElementTag::A,
-                                children: vec![Node::Text(TextNode {
-                                    text: rest[0].1.clone().into(),
-                                })],
-                                ..Default::default()
-                            }),
-                            Node::Element(ElementNode {
-                                tag: self.list_type.to_tag(),
-                                children: output,
-                                ..Default::default()
-                            }),
-                        ],
+                        children: list,
                         ..Default::default()
                     }));
                 }
@@ -139,22 +148,25 @@ impl MakeToc {
             } else {
                 let output = self.nest(&rest[1..]);
 
+                let mut list = vec![Node::Element(ElementNode {
+                    tag: ElementTag::A,
+                    children: vec![Node::Text(TextNode {
+                        text: rest[0].1.clone().into(),
+                    })],
+                    ..Default::default()
+                })];
+
+                if !output.is_empty() {
+                    list.push(Node::Element(ElementNode {
+                        tag: self.list_type.to_tag(),
+                        children: output,
+                        ..Default::default()
+                    }));
+                }
+
                 children.push(Node::Element(ElementNode {
                     tag: ElementTag::Li,
-                    children: vec![
-                        Node::Element(ElementNode {
-                            tag: ElementTag::A,
-                            children: vec![Node::Text(TextNode {
-                                text: rest[0].1.clone().into(),
-                            })],
-                            ..Default::default()
-                        }),
-                        Node::Element(ElementNode {
-                            tag: self.list_type.to_tag(),
-                            children: output,
-                            ..Default::default()
-                        }),
-                    ],
+                    children: list,
                     ..Default::default()
                 }));
 
