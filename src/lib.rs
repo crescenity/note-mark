@@ -17,17 +17,17 @@ impl Markdown {
         Self::default()
     }
 
-    pub fn parser(&mut self, parser: Parser) -> &mut Self {
+    pub fn parser(mut self, parser: Parser) -> Self {
         self.parser = parser;
         self
     }
 
-    pub fn transformer(&mut self, transformer: Transformer) -> &mut Self {
+    pub fn transformer(mut self, transformer: Transformer) -> Self {
         self.transformer = transformer;
         self
     }
 
-    pub fn stringifier(&mut self, stringifier: Stringifier) -> &mut Self {
+    pub fn stringifier(mut self, stringifier: Stringifier) -> Self {
         self.stringifier = stringifier;
         self
     }
