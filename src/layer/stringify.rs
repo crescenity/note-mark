@@ -156,11 +156,10 @@ mod tests {
         let document = DocumentNode {
             root: vec![Node::Element(ElementNode {
                 tag: ElementTag::P,
-                id: vec![],
-                class: vec![],
                 children: vec![Node::Text(TextNode {
                     text: "Hello, world!".into(),
                 })],
+                ..Default::default()
             })],
         };
 
@@ -174,40 +173,35 @@ mod tests {
         let document = DocumentNode {
             root: vec![Node::Element(ElementNode {
                 tag: ElementTag::P,
-                id: vec![],
-                class: vec![],
                 children: vec![
                     Node::Text(TextNode {
                         text: "Hello, ".into(),
                     }),
                     Node::Element(ElementNode {
                         tag: ElementTag::Strong,
-                        id: vec![],
-                        class: vec![],
                         children: vec![Node::Text(TextNode {
                             text: "world".into(),
                         })],
+                        ..Default::default()
                     }),
                     Node::Text(TextNode { text: "!".into() }),
                     Node::Element(ElementNode {
                         tag: ElementTag::Br,
-                        id: vec![],
-                        class: vec![],
-                        children: vec![],
+                        ..Default::default()
                     }),
                     Node::Text(TextNode {
                         text: "Hello, ".into(),
                     }),
                     Node::Element(ElementNode {
                         tag: ElementTag::Strong,
-                        id: vec![],
-                        class: vec![],
                         children: vec![Node::Text(TextNode {
                             text: "world".into(),
                         })],
+                        ..Default::default()
                     }),
                     Node::Text(TextNode { text: "!".into() }),
                 ],
+                ..Default::default()
             })],
         };
 

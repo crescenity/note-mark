@@ -79,7 +79,22 @@ pub struct ElementNode<'a> {
     pub tag: ElementTag,
     pub id: Vec<String>,
     pub class: Vec<String>,
+    pub href: Option<String>,
+    pub attrs: Vec<(String, String)>,
     pub children: Vec<Node<'a>>,
+}
+
+impl Default for ElementNode<'_> {
+    fn default() -> Self {
+        Self {
+            tag: ElementTag::Div,
+            id: vec![],
+            class: vec![],
+            href: None,
+            attrs: vec![],
+            children: vec![],
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
