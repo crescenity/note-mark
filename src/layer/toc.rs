@@ -174,7 +174,7 @@ impl MakeToc {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{Markdown, Stringifier};
+    use crate::Markdown;
 
     #[test]
     fn test_make_toc() {
