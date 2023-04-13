@@ -70,11 +70,7 @@ impl MakeToc {
             } else {
                 let mut index = 1;
 
-                loop {
-                    if set.insert(text.clone() + &index.to_string()) {
-                        break;
-                    }
-
+                while !set.insert(text.clone() + &index.to_string()) {
                     index += 1;
                 }
 
