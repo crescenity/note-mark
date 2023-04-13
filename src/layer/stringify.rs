@@ -127,7 +127,7 @@ impl Stringifier {
                                 .map(|line| String::from("    ") + line)
                                 .collect::<Vec<_>>()
                                 .join("\n");
-                            format!("\n<{tag}{attrs}>\n{children}\n</{tag}>\n")
+                            format!("<{tag}{attrs}>\n{children}\n</{tag}>")
                         } else {
                             format!("<{tag}{attrs}>{children}</{tag}>")
                         }
