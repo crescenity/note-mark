@@ -102,6 +102,9 @@ impl MakeToc {
                 .position(|(level, _, _)| *level <= rest[0].0);
 
             if let Some(index) = next {
+                // `index` is the index of the next element with the same or higher level
+                let index = index + 1;
+
                 if index == 1 {
                     children.push(Node::Element(ElementNode {
                         tag: ElementTag::Li,
@@ -116,7 +119,7 @@ impl MakeToc {
                         ..Default::default()
                     }));
                 } else {
-                    let output = self.nest(&rest[1..index + 1]);
+                    let output = self.nest(&rest[1..index]);
 
                     children.push(Node::Element(ElementNode {
                         tag: ElementTag::Li,
@@ -135,23 +138,24 @@ impl MakeToc {
                     }));
                 }
 
-                rest = &rest[index + 1..];
+                rest = &rest[index..];
             } else {
-                let output = self.nest(&rest[1..]);
+                let mut children2 = vec![Node::Element(ElementNode {
+                    tag: ElementTag::A,
+                    href: Some(String::from("#") + &rest[0].2),
+                    children: vec![Node::Text(TextNode {
+                        text: rest[0].1.clone().into(),
+                    })],
+                    ..Default::default()
+                })];
+
+                if rest.len() >= 2 {
+                    children2.push(self.nest(&rest[1..]));
+                }
 
                 children.push(Node::Element(ElementNode {
                     tag: ElementTag::Li,
-                    children: vec![
-                        Node::Element(ElementNode {
-                            tag: ElementTag::A,
-                            href: Some(String::from("#") + &rest[0].2),
-                            children: vec![Node::Text(TextNode {
-                                text: rest[0].1.clone().into(),
-                            })],
-                            ..Default::default()
-                        }),
-                        output,
-                    ],
+                    children: children2,
                     ..Default::default()
                 }));
 
