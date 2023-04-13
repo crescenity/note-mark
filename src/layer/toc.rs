@@ -120,17 +120,17 @@ impl MakeToc {
 
                     children.push(Node::Element(ElementNode {
                         tag: ElementTag::Li,
-                        children: vec![Node::Element(ElementNode {
-                            tag: ElementTag::A,
-                            href: Some(String::from("#") + &rest[0].2),
-                            children: vec![
-                                Node::Text(TextNode {
+                        children: vec![
+                            Node::Element(ElementNode {
+                                tag: ElementTag::A,
+                                href: Some(String::from("#") + &rest[0].2),
+                                children: vec![Node::Text(TextNode {
                                     text: rest[0].1.clone().into(),
-                                }),
-                                output,
-                            ],
-                            ..Default::default()
-                        })],
+                                })],
+                                ..Default::default()
+                            }),
+                            output,
+                        ],
                         ..Default::default()
                     }));
                 }
