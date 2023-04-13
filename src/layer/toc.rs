@@ -101,6 +101,15 @@ impl MakeToc {
                 .iter()
                 .position(|(level, _, _)| *level <= rest[0].0);
 
+            let a_tag = Node::Element(ElementNode {
+                tag: ElementTag::A,
+                href: Some(String::from("#") + &rest[0].2),
+                children: vec![Node::Text(TextNode {
+                    text: rest[0].1.clone().into(),
+                })],
+                ..Default::default()
+            });
+
             if let Some(index) = next {
                 // `index` is the index of the next element with the same or higher level
                 let index = index + 1;
@@ -108,14 +117,7 @@ impl MakeToc {
                 if index == 1 {
                     children.push(Node::Element(ElementNode {
                         tag: ElementTag::Li,
-                        children: vec![Node::Element(ElementNode {
-                            tag: ElementTag::A,
-                            href: Some(String::from("#") + &rest[0].2),
-                            children: vec![Node::Text(TextNode {
-                                text: rest[0].1.clone().into(),
-                            })],
-                            ..Default::default()
-                        })],
+                        children: vec![a_tag],
                         ..Default::default()
                     }));
                 } else {
@@ -123,31 +125,14 @@ impl MakeToc {
 
                     children.push(Node::Element(ElementNode {
                         tag: ElementTag::Li,
-                        children: vec![
-                            Node::Element(ElementNode {
-                                tag: ElementTag::A,
-                                href: Some(String::from("#") + &rest[0].2),
-                                children: vec![Node::Text(TextNode {
-                                    text: rest[0].1.clone().into(),
-                                })],
-                                ..Default::default()
-                            }),
-                            output,
-                        ],
+                        children: vec![a_tag, output],
                         ..Default::default()
                     }));
                 }
 
                 rest = &rest[index..];
             } else {
-                let mut children2 = vec![Node::Element(ElementNode {
-                    tag: ElementTag::A,
-                    href: Some(String::from("#") + &rest[0].2),
-                    children: vec![Node::Text(TextNode {
-                        text: rest[0].1.clone().into(),
-                    })],
-                    ..Default::default()
-                })];
+                let mut children2 = vec![a_tag];
 
                 if rest.len() >= 2 {
                     children2.push(self.nest(&rest[1..]));
