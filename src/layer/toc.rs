@@ -193,7 +193,7 @@ mod tests {
         let input =
             "# H1AAAAAA\n\n# H1AAAAAA\n\n# H1BBBBBB\n\n## H2AAAAAA\n\n## H2BBBBBB\n\n# H1CCCCCC\n\n";
 
-        let markdown = Markdown::default().stringifier(Stringifier::default());
+        let markdown = Markdown::default();
 
         let tokens = Markdown::lex(input);
         let tree = markdown.parser.parse(input, tokens);
