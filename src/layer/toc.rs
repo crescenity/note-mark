@@ -106,39 +106,30 @@ impl MakeToc {
                 ..Default::default()
             });
 
+            let mut element = ElementNode {
+                tag: ElementTag::Li,
+                children: vec![a_tag],
+                ..Default::default()
+            };
+
             if let Some(index) = next {
                 // `index` is the index of the next element with the same or higher level
                 let index = index + 1;
 
-                if index == 1 {
-                    children.push(Node::Element(ElementNode {
-                        tag: ElementTag::Li,
-                        children: vec![a_tag],
-                        ..Default::default()
-                    }));
-                } else {
+                if index != 1 {
                     let output = self.nest(&rest[1..index]);
-
-                    children.push(Node::Element(ElementNode {
-                        tag: ElementTag::Li,
-                        children: vec![a_tag, output],
-                        ..Default::default()
-                    }));
+                    element.children.push(output);
                 }
+
+                children.push(Node::Element(element));
 
                 rest = &rest[index..];
             } else {
-                let mut children2 = vec![a_tag];
-
                 if rest.len() >= 2 {
-                    children2.push(self.nest(&rest[1..]));
+                    element.children.push(self.nest(&rest[1..]));
                 }
 
-                children.push(Node::Element(ElementNode {
-                    tag: ElementTag::Li,
-                    children: children2,
-                    ..Default::default()
-                }));
+                children.push(Node::Element(element));
 
                 rest = &[];
             }
