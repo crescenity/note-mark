@@ -1,7 +1,7 @@
 mod layer;
 mod model;
 
-use layer::*;
+pub use layer::*;
 
 pub use model::*;
 
@@ -43,6 +43,19 @@ impl Markdown {
         let tree = self.parser.parse(input, tokens);
         let document = self.transformer.transform(tree);
         self.stringifier.stringify(document)
+    }
+
+    pub fn execute_with_toc(&self, input: &str) -> (String, String) {
+        let tokens = lex(input);
+        let tree = self.parser.parse(input, tokens);
+        let mut document = self.transformer.transform(tree);
+
+        let toc = MakeToc::default().make_toc(&mut document);
+
+        (
+            self.stringifier.stringify(document),
+            self.stringifier.stringify(toc),
+        )
     }
 }
 

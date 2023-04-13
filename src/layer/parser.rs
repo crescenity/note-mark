@@ -20,6 +20,7 @@ pub mod config {
     }
 
     /// Ending of headline.
+    #[allow(clippy::enum_variant_names)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum HeadlineEnding {
         SoftBreak,
