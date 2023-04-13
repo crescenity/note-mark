@@ -57,6 +57,18 @@ impl ElementTag {
             _ => None,
         }
     }
+
+    pub fn get_headline_level(&self) -> Option<u8> {
+        match self {
+            Self::H1 => Some(1),
+            Self::H2 => Some(2),
+            Self::H3 => Some(3),
+            Self::H4 => Some(4),
+            Self::H5 => Some(5),
+            Self::H6 => Some(6),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -72,6 +84,17 @@ impl Node<'_> {
             Node::Text(_) => false,
         }
     }
+}
+
+pub fn get_text(nodes: &[Node<'_>]) -> String {
+    nodes
+        .iter()
+        .map(|node| match node {
+            Node::Element(element) => get_text(&element.children),
+            Node::Text(text) => text.text.to_string(),
+        })
+        .collect::<Vec<_>>()
+        .join("")
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
