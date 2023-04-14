@@ -55,20 +55,16 @@ fn tag_to_str(tag: ElementTag) -> &'static str {
 
 impl Stringifier {
     pub fn stringify(&self, document: DocumentNode) -> String {
+        let list = document
+            .root
+            .into_iter()
+            .map(|node| self.stringify_node(node))
+            .collect::<Vec<_>>();
+
         if self.format {
-            document
-                .root
-                .into_iter()
-                .map(|node| self.stringify_node(node))
-                .collect::<Vec<_>>()
-                .join("\n")
+            list.join("\n")
         } else {
-            document
-                .root
-                .into_iter()
-                .map(|node| self.stringify_node(node))
-                .collect::<Vec<_>>()
-                .join("")
+            list.join("")
         }
     }
 
