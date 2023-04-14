@@ -85,48 +85,38 @@ impl Stringifier {
         match element.tag {
             ElementTag::Br => format!("<{tag}>"),
             _ => {
-                let class = if !element.class.is_empty() {
-                    format!(
+                let mut attrs = String::new();
+
+                if !element.class.is_empty() {
+                    attrs += &format!(
                         " class=\"{}\"",
                         element.class.into_iter().collect::<Vec<_>>().join(" ")
-                    )
-                } else {
-                    String::new()
-                };
+                    );
+                }
 
-                let id = if !element.id.is_empty() {
-                    format!(
+                if !element.id.is_empty() {
+                    attrs += &format!(
                         " id=\"{}\"",
                         element.id.into_iter().collect::<Vec<_>>().join(" ")
-                    )
-                } else {
-                    String::new()
-                };
+                    );
+                }
 
-                let href = if let Some(href) = element.href {
-                    format!(" href=\"{href}\"")
-                } else {
-                    String::new()
-                };
+                if let Some(href) = element.href {
+                    attrs += &format!(" href=\"{href}\"");
+                }
 
-                let attrs = element
+                attrs += &element
                     .attrs
                     .iter()
                     .map(|(name, value)| format!(" {name}=\"{value}\""))
                     .collect::<String>();
-
-                let attrs = format!("{class}{id}{href}{attrs}");
 
                 if self.format {
                     if element.children.len() == 1 {
                         let children = self.stringify_node(element.children[0].clone());
 
                         if children.len() >= self.width as usize {
-                            let children = children
-                                .lines()
-                                .map(|line| String::from("    ") + line)
-                                .collect::<Vec<_>>()
-                                .join("\n");
+                            let children = Self::add_indent(&children);
                             format!("<{tag}{attrs}>\n{children}\n</{tag}>")
                         } else {
                             format!("<{tag}{attrs}>{children}</{tag}>")
@@ -152,11 +142,9 @@ impl Stringifier {
                             .into_iter()
                             .map(|node| self.stringify_node(node))
                             .collect::<Vec<_>>()
-                            .join("\n")
-                            .lines()
-                            .map(|line| String::from("    ") + line)
-                            .collect::<Vec<_>>()
                             .join("\n");
+
+                        let children = Self::add_indent(&children);
 
                         format!("<{tag}{attrs}>\n{children}\n</{tag}>")
                     }
@@ -176,6 +164,14 @@ impl Stringifier {
 
     fn stringify_text(&self, text: TextNode) -> String {
         text.text.to_string()
+    }
+
+    fn add_indent(input: &str) -> String {
+        input
+            .lines()
+            .map(|line| String::from("    ") + line)
+            .collect::<Vec<_>>()
+            .join("\n")
     }
 }
 
