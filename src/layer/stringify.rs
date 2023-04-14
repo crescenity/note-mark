@@ -118,33 +118,31 @@ impl Stringifier {
                     .map(|node| self.stringify_node(node))
                     .collect::<Vec<_>>();
 
-                if self.format {
+                let inner = if self.format {
                     if element.children.len() == 1 {
                         let child = list[0].clone();
 
                         if child.len() >= self.width as usize {
                             let child = Self::add_indent(&child);
 
-                            format!("<{tag}{attrs}>\n{child}\n</{tag}>")
+                            format!("\n{child}\n")
                         } else {
-                            format!("<{tag}{attrs}>{child}</{tag}>")
+                            child
                         }
                     } else if !element.children.iter().any(|node| node.is_block_item()) {
-                        let children = list.join("");
-
-                        format!("<{tag}{attrs}>{children}</{tag}>")
+                        list.join("")
                     } else {
                         let children = list.join("\n");
 
                         let children = Self::add_indent(&children);
 
-                        format!("<{tag}{attrs}>\n{children}\n</{tag}>")
+                        format!("\n{children}\n")
                     }
                 } else {
-                    let children = list.join("");
+                    list.join("")
+                };
 
-                    format!("<{tag}{attrs}>{children}</{tag}>")
-                }
+                format!("<{tag}{attrs}>{inner}</{tag}>")
             }
         }
     }
