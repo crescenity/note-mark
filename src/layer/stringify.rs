@@ -111,50 +111,37 @@ impl Stringifier {
                     .map(|(name, value)| format!(" {name}=\"{value}\""))
                     .collect::<String>();
 
+                let list = element
+                    .children
+                    .iter()
+                    .cloned()
+                    .map(|node| self.stringify_node(node))
+                    .collect::<Vec<_>>();
+
                 if self.format {
                     if element.children.len() == 1 {
-                        let children = self.stringify_node(element.children[0].clone());
+                        let child = list[0].clone();
 
-                        if children.len() >= self.width as usize {
-                            let children = Self::add_indent(&children);
-                            format!("<{tag}{attrs}>\n{children}\n</{tag}>")
+                        if child.len() >= self.width as usize {
+                            let child = Self::add_indent(&child);
+
+                            format!("<{tag}{attrs}>\n{child}\n</{tag}>")
                         } else {
-                            format!("<{tag}{attrs}>{children}</{tag}>")
+                            format!("<{tag}{attrs}>{child}</{tag}>")
                         }
-                    } else if element
-                        .children
-                        .iter()
-                        .filter(|node| node.is_block_item())
-                        .count()
-                        == 0
-                    {
-                        let children = element
-                            .children
-                            .into_iter()
-                            .map(|node| self.stringify_node(node))
-                            .collect::<Vec<_>>()
-                            .join("");
+                    } else if !element.children.iter().any(|node| node.is_block_item()) {
+                        let children = list.join("");
 
                         format!("<{tag}{attrs}>{children}</{tag}>")
                     } else {
-                        let children = element
-                            .children
-                            .into_iter()
-                            .map(|node| self.stringify_node(node))
-                            .collect::<Vec<_>>()
-                            .join("\n");
+                        let children = list.join("\n");
 
                         let children = Self::add_indent(&children);
 
                         format!("<{tag}{attrs}>\n{children}\n</{tag}>")
                     }
                 } else {
-                    let children = element
-                        .children
-                        .into_iter()
-                        .map(|node| self.stringify_node(node))
-                        .collect::<Vec<_>>()
-                        .join("");
+                    let children = list.join("");
 
                     format!("<{tag}{attrs}>{children}</{tag}>")
                 }
