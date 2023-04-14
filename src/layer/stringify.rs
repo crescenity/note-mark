@@ -55,20 +55,16 @@ fn tag_to_str(tag: ElementTag) -> &'static str {
 
 impl Stringifier {
     pub fn stringify(&self, document: DocumentNode) -> String {
+        let list = document
+            .root
+            .into_iter()
+            .map(|node| self.stringify_node(node))
+            .collect::<Vec<_>>();
+
         if self.format {
-            document
-                .root
-                .into_iter()
-                .map(|node| self.stringify_node(node))
-                .collect::<Vec<_>>()
-                .join("\n")
+            list.join("\n")
         } else {
-            document
-                .root
-                .into_iter()
-                .map(|node| self.stringify_node(node))
-                .collect::<Vec<_>>()
-                .join("")
+            list.join("")
         }
     }
 
@@ -85,97 +81,78 @@ impl Stringifier {
         match element.tag {
             ElementTag::Br => format!("<{tag}>"),
             _ => {
-                let class = if !element.class.is_empty() {
-                    format!(
+                let mut attrs = String::new();
+
+                if !element.class.is_empty() {
+                    attrs += &format!(
                         " class=\"{}\"",
                         element.class.into_iter().collect::<Vec<_>>().join(" ")
-                    )
-                } else {
-                    String::new()
-                };
+                    );
+                }
 
-                let id = if !element.id.is_empty() {
-                    format!(
+                if !element.id.is_empty() {
+                    attrs += &format!(
                         " id=\"{}\"",
                         element.id.into_iter().collect::<Vec<_>>().join(" ")
-                    )
-                } else {
-                    String::new()
-                };
+                    );
+                }
 
-                let href = if let Some(href) = element.href {
-                    format!(" href=\"{href}\"")
-                } else {
-                    String::new()
-                };
+                if let Some(href) = element.href {
+                    attrs += &format!(" href=\"{href}\"");
+                }
 
-                let attrs = element
+                attrs += &element
                     .attrs
                     .iter()
                     .map(|(name, value)| format!(" {name}=\"{value}\""))
                     .collect::<String>();
 
-                let attrs = format!("{class}{id}{href}{attrs}");
+                let list = element
+                    .children
+                    .iter()
+                    .cloned()
+                    .map(|node| self.stringify_node(node))
+                    .collect::<Vec<_>>();
 
-                if self.format {
+                let inner = if self.format {
                     if element.children.len() == 1 {
-                        let children = self.stringify_node(element.children[0].clone());
+                        let child = list[0].clone();
 
-                        if children.len() >= self.width as usize {
-                            let children = children
-                                .lines()
-                                .map(|line| String::from("    ") + line)
-                                .collect::<Vec<_>>()
-                                .join("\n");
-                            format!("<{tag}{attrs}>\n{children}\n</{tag}>")
+                        if child.len() >= self.width as usize {
+                            let child = Self::add_indent(&child);
+
+                            format!("\n{child}\n")
                         } else {
-                            format!("<{tag}{attrs}>{children}</{tag}>")
+                            child
                         }
-                    } else if element
-                        .children
-                        .iter()
-                        .filter(|node| node.is_block_item())
-                        .count()
-                        == 0
-                    {
-                        let children = element
-                            .children
-                            .into_iter()
-                            .map(|node| self.stringify_node(node))
-                            .collect::<Vec<_>>()
-                            .join("");
-
-                        format!("<{tag}{attrs}>{children}</{tag}>")
+                    } else if !element.children.iter().any(|node| node.is_block_item()) {
+                        list.join("")
                     } else {
-                        let children = element
-                            .children
-                            .into_iter()
-                            .map(|node| self.stringify_node(node))
-                            .collect::<Vec<_>>()
-                            .join("\n")
-                            .lines()
-                            .map(|line| String::from("    ") + line)
-                            .collect::<Vec<_>>()
-                            .join("\n");
+                        let children = list.join("\n");
 
-                        format!("<{tag}{attrs}>\n{children}\n</{tag}>")
+                        let children = Self::add_indent(&children);
+
+                        format!("\n{children}\n")
                     }
                 } else {
-                    let children = element
-                        .children
-                        .into_iter()
-                        .map(|node| self.stringify_node(node))
-                        .collect::<Vec<_>>()
-                        .join("");
+                    list.join("")
+                };
 
-                    format!("<{tag}{attrs}>{children}</{tag}>")
-                }
+                format!("<{tag}{attrs}>{inner}</{tag}>")
             }
         }
     }
 
     fn stringify_text(&self, text: TextNode) -> String {
         text.text.to_string()
+    }
+
+    fn add_indent(input: &str) -> String {
+        input
+            .lines()
+            .map(|line| String::from("    ") + line)
+            .collect::<Vec<_>>()
+            .join("\n")
     }
 }
 
