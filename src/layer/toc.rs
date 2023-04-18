@@ -170,7 +170,7 @@ impl TocMaker {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Markdown;
+    use crate::{layer::lexer::lex, Markdown};
 
     #[test]
     fn test_make_toc() {
@@ -179,7 +179,7 @@ mod tests {
 
         let markdown = Markdown::default();
 
-        let tokens = Markdown::lex(input);
+        let tokens = lex(input);
         let tree = markdown.parser.parse(input, tokens);
         let mut document = markdown.transformer.transform(tree);
 
