@@ -1,10 +1,14 @@
+//! Transformer of Markdown tree to HTML tree.
+
 use std::borrow::Cow;
 
 use crate::model::{html::*, tree::*};
 
+/// The struct to transform Markdown tree to HTML tree.
 #[derive(Debug, Clone)]
 pub struct Transformer {
-    pub section: bool,
+    #[allow(dead_code)]
+    section: bool,
 }
 
 #[allow(clippy::derivable_impls)]
@@ -15,17 +19,20 @@ impl Default for Transformer {
 }
 
 impl Transformer {
+    /// Create a new Transformer.
     pub fn new() -> Self {
         Self::default()
     }
 
-    pub fn section(mut self, section: bool) -> Self {
+    #[allow(dead_code)]
+    fn section(mut self, section: bool) -> Self {
         self.section = section;
         self
     }
 }
 
 impl Transformer {
+    /// Transform Markdown tree to HTML tree.
     pub fn transform<'a>(&self, tree: MarkdownTree<'a>) -> DocumentNode<'a> {
         DocumentNode {
             root: self.block_tree(tree.root),
