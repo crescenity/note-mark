@@ -2,8 +2,8 @@ use crate::model::html::*;
 
 #[derive(Debug, Clone)]
 pub struct Stringifier {
-    format: bool,
-    width: u32,
+    pub format: bool,
+    pub width: u32,
 }
 
 impl Default for Stringifier {

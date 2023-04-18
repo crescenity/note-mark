@@ -4,10 +4,10 @@ use config::*;
 /// LR(1) parser
 #[derive(Debug, Clone)]
 pub struct Parser {
-    paragraph_ending: ParagraphEnding,
-    headline_ending: HeadlineEnding,
-    list_indent_rule: IndentRule,
-    list_indent_style: IndentStyle,
+    pub paragraph_ending: ParagraphEnding,
+    pub headline_ending: HeadlineEnding,
+    pub list_indent_rule: IndentRule,
+    pub list_indent_style: IndentStyle,
 }
 
 /// Configurations for parsing.

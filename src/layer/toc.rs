@@ -6,8 +6,8 @@ use config::*;
 
 #[derive(Debug, Clone)]
 pub struct TocMaker {
-    level: u8,
-    list_type: ListType,
+    pub level: u8,
+    pub list_type: ListType,
 }
 
 pub mod config {

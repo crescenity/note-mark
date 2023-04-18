@@ -4,7 +4,7 @@ use crate::model::{html::*, tree::*};
 
 #[derive(Debug, Clone)]
 pub struct Transformer {
-    section: bool,
+    pub section: bool,
 }
 
 #[allow(clippy::derivable_impls)]
