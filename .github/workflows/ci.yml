@@ -7,7 +7,7 @@ on:
     branches: ["main"]
 
 jobs:
-  name: fmt
+  fmt:
   runs-on: ubuntu-latest
   steps:
     - uses: actions/checkout@v3
@@ -19,7 +19,7 @@ jobs:
     - name: Run rustfmt
       run: cargo fmt --all -- --check
 
-  name: clippy
+  clippy:
   runs-on: ubuntu-latest
   steps:
     - uses: actions/checkout@v3
