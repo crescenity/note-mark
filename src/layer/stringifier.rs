@@ -1,8 +1,15 @@
+//! Stringify DocumentNode to html string.
+
 use crate::model::html::*;
 
+/// Stringify DocumentNode to html string.
+///
+/// This contains some options.
 #[derive(Debug, Clone)]
 pub struct Stringifier {
+    /// Whether to format the output. Default is false.
     pub format: bool,
+    /// The width of the line to break the code and indent. Default is 20.
     pub width: u32,
 }
 
@@ -16,15 +23,18 @@ impl Default for Stringifier {
 }
 
 impl Stringifier {
+    /// Create a new Stringifier.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Set whether to format the output.
     pub fn format(mut self, format: bool) -> Self {
         self.format = format;
         self
     }
 
+    /// Set the width of the output.
     pub fn width(mut self, width: u32) -> Self {
         self.width = width;
         self
@@ -54,6 +64,7 @@ fn tag_to_str(tag: ElementTag) -> &'static str {
 }
 
 impl Stringifier {
+    /// Stringify DocumentNode to html string.
     pub fn stringify(&self, document: DocumentNode) -> String {
         let list = document
             .root
