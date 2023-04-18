@@ -1,43 +1,88 @@
-mod layer;
-mod model;
+//! note-mark is a markdown parser. It is a library that can be used to parse
+//! markdown into HTML.
+//!
+//! # Example
+//!
+//! ```
+//! use note_mark::prelude::*;
+//!
+//! let markdown = Markdown::default();
+//!
+//! let html = markdown.execute("# Hello, world!");
+//!
+//! assert_eq!(html, "<h1>Hello, world!</h1>");
+//!
+//! let html = markdown.execute("# Hello, world!\n\nThis is a paragraph.");
+//!
+//! assert_eq!(html, "<h1>Hello, world!</h1><p>This is a paragraph.</p>");
+//! ```
 
-pub use layer::*;
+pub mod layer;
+pub mod model;
+pub mod prelude;
 
-pub use model::*;
+use layer::{
+    lexer::lex, parser::Parser, stringifier::Stringifier, toc::TocMaker, transformer::Transformer,
+};
 
+/// Markdown parser and transformer.
+///
+/// # Example
+///
+/// ```
+/// use note_mark::prelude::*;
+///
+/// let markdown = Markdown::default();
+///
+/// let html = markdown.execute("# Hello, world!\n\nThis is a paragraph.");
+///
+/// assert_eq!(html, "<h1>Hello, world!</h1><p>This is a paragraph.</p>");
+/// ```
 #[derive(Debug, Clone, Default)]
 pub struct Markdown {
+    /// Parser configuration.
     parser: Parser,
+    /// Transformer configuration.
     transformer: Transformer,
+    /// Stringifier configuration.
     stringifier: Stringifier,
+    /// Table of contents maker configuration.
+    toc_maker: TocMaker,
 }
 
 impl Markdown {
+    /// Create a new `Markdown` instance.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Set the parser configuration.
     pub fn parser(mut self, parser: Parser) -> Self {
         self.parser = parser;
         self
     }
 
+    /// Set the transformer configuration.
     pub fn transformer(mut self, transformer: Transformer) -> Self {
         self.transformer = transformer;
         self
     }
 
+    /// Set the stringifier configuration.
     pub fn stringifier(mut self, stringifier: Stringifier) -> Self {
         self.stringifier = stringifier;
+        self
+    }
+
+    /// Set the table of contents maker configuration.
+    pub fn toc_maker(mut self, toc_maker: TocMaker) -> Self {
+        self.toc_maker = toc_maker;
         self
     }
 }
 
 impl Markdown {
-    pub fn lex(input: &str) -> impl Iterator<Item = model::token::Token> + '_ {
-        lex(input)
-    }
-
+    /// Execute the markdown parser.
     pub fn execute(&self, input: &str) -> String {
         let tokens = lex(input);
         let tree = self.parser.parse(input, tokens);
@@ -45,12 +90,58 @@ impl Markdown {
         self.stringifier.stringify(document)
     }
 
+    /// Execute the markdown parser and generate the table of contents.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use note_mark::prelude::*;
+    ///
+    /// let markdown = Markdown::default();
+    ///
+    /// let input = concat![
+    ///     "# Headline1-1\n\n",
+    ///     "# Headline1-2\n\n",
+    ///     "## Headline2-1\n\n",
+    ///     "## Headline2-2\n\n",
+    ///     "# Headline1-3\n\n",
+    /// ];
+    ///
+    /// let (html, toc) = markdown.execute_with_toc(input);
+    ///
+    /// assert_eq!(toc, "<ul><li><a href=\"#Headline1-1\">Headline1-1</a></li><li><a href=\"#Headline1-2\">Headline1-2</a><ul><li><a href=\"#Headline2-1\">Headline2-1</a></li><li><a href=\"#Headline2-2\">Headline2-2</a></li></ul></li><li><a href=\"#Headline1-3\">Headline1-3</a></li></ul>");
+    /// ```
+    /// ## Original output
+    ///
+    /// ```html
+    /// <h1 id="Headline1-1">Headline1-1</h1>
+    /// <h1 id="Headline1-2">Headline1-2</h1>
+    /// <h2 id="Headline2-1">Headline2-1</h2>
+    /// <h2 id="Headline2-2">Headline2-2</h2>
+    /// <h1 id="Headline1-3">Headline1-3</h1>
+    /// ```
+    ///
+    /// ## Toc output
+    ///
+    /// ```html
+    /// <ul>
+    ///     <li><a href="#Headline1-1">Headline1-1</a></li>
+    ///     <li>
+    ///         <a href="#Headline1-2">Headline1-2</a>
+    ///         <ul>
+    ///             <li><a href="#Headline2-1">Headline2-1</a></li>
+    ///             <li><a href="#Headline2-2">Headline2-2</a></li>
+    ///         </ul>
+    ///     </li>
+    ///     <li><a href="#Headline1-3">Headline1-3</a></li>
+    /// </ul>
+    /// ```
     pub fn execute_with_toc(&self, input: &str) -> (String, String) {
         let tokens = lex(input);
         let tree = self.parser.parse(input, tokens);
         let mut document = self.transformer.transform(tree);
 
-        let toc = MakeToc::default().make_toc(&mut document);
+        let toc = self.toc_maker.make_toc(&mut document);
 
         (
             self.stringifier.stringify(document),

@@ -1,8 +1,17 @@
+//! Lexer for the Markdown syntax.
+//!
+//! This module contains the lexer for the Markdown syntax. At this stage, the
+//! text is joined and non-breakable spaces are removed.
+
 use peekmore::{PeekMore, PeekMoreIterator};
 use std::iter::Peekable;
 
 use crate::model::token::*;
 
+/// Split a string into tokens.
+///
+/// This returns an iterator that yields tokens. This iterator has static
+/// lifetime, though tokens refer to the input string.
 pub fn lex(input: &'_ str) -> impl Iterator<Item = Token> + '_ {
     let lexer = Lexer::new(input);
     let lexer = TextJoiner::new(lexer);

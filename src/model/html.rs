@@ -1,10 +1,16 @@
+//! HTML document model.
+//!
+//! This module contains the data structures used to represent an HTML.
+
 use std::borrow::Cow;
 
+/// The struct to represent an root HTML document.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DocumentNode<'a> {
     pub root: Vec<Node<'a>>,
 }
 
+/// The enum to represent an HTML element tag.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ElementTag {
     Div,
@@ -27,6 +33,7 @@ pub enum ElementTag {
 }
 
 impl ElementTag {
+    /// Whether this tag is a block item.
     pub fn is_block_item(&self) -> bool {
         matches!(
             self,
@@ -46,6 +53,7 @@ impl ElementTag {
 }
 
 impl ElementTag {
+    /// Create a new ElementTag from a headline level.
     pub fn headline(level: u8) -> Option<Self> {
         match level {
             1 => Some(Self::H1),
@@ -58,6 +66,7 @@ impl ElementTag {
         }
     }
 
+    /// Return headline level if this tag is a headline.
     pub fn get_headline_level(&self) -> Option<u8> {
         match self {
             Self::H1 => Some(1),
@@ -71,6 +80,7 @@ impl ElementTag {
     }
 }
 
+/// The enum to represent an HTML node.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Node<'a> {
     Element(ElementNode<'a>),
@@ -78,6 +88,7 @@ pub enum Node<'a> {
 }
 
 impl Node<'_> {
+    /// Whether this node is a block item.
     pub fn is_block_item(&self) -> bool {
         match self {
             Node::Element(element) => element.tag.is_block_item(),
@@ -86,6 +97,7 @@ impl Node<'_> {
     }
 }
 
+/// Stringify a node.
 pub fn get_text(nodes: &[Node<'_>]) -> String {
     nodes
         .iter()
@@ -97,13 +109,20 @@ pub fn get_text(nodes: &[Node<'_>]) -> String {
         .join("")
 }
 
+/// The struct to represent an HTML element node.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ElementNode<'a> {
+    /// The tag of this element.
     pub tag: ElementTag,
+    /// The id of this element.
     pub id: Vec<String>,
+    /// The classes of this element.
     pub class: Vec<String>,
+    /// The href of this element.
     pub href: Option<String>,
+    /// The attributes of this element.
     pub attrs: Vec<(String, String)>,
+    /// The children of this element.
     pub children: Vec<Node<'a>>,
 }
 
@@ -120,6 +139,7 @@ impl Default for ElementNode<'_> {
     }
 }
 
+/// The struct to represent an HTML text node.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TextNode<'a> {
     pub text: Cow<'a, str>,
