@@ -1,5 +1,5 @@
 use crate::model::{token::*, tree::*};
-pub use config::*;
+use config::*;
 
 /// LR(1) parser
 #[derive(Debug, Clone)]
@@ -788,7 +788,7 @@ impl<'a, 'b> Executor<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layer::lex;
+    use crate::layer::lexer::lex;
 
     fn lex_to_vec(input: &str) -> Vec<Token> {
         lex(input).collect()

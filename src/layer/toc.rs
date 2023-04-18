@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use crate::model::html::*;
 
-pub use config::*;
+use config::*;
 
 #[derive(Debug, Clone)]
 pub struct TocMaker {
@@ -11,7 +11,7 @@ pub struct TocMaker {
 }
 
 pub mod config {
-    use crate::html::ElementTag;
+    use crate::model::html::ElementTag;
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum ListType {
