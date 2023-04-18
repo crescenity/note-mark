@@ -41,7 +41,7 @@ pub struct Parser {
     /// This determines whether to allow a line break in a headline.
     pub headline_ending: HeadlineEnding,
     /// This determines whether to make the indent rule of list strict or loose.
-    pub list_indent_rule: IndentRule,
+    list_indent_rule: IndentRule,
     /// This determines whether to make the indent style of list space, tab, or
     /// both.
     pub list_indent_style: IndentStyle,
@@ -163,7 +163,8 @@ impl Parser {
     /// Set indent rule of list.
     ///
     /// **This config did not work correctly.**
-    pub fn list_indent_rule(mut self, rule: IndentRule) -> Self {
+    #[allow(dead_code)]
+    fn list_indent_rule(mut self, rule: IndentRule) -> Self {
         self.list_indent_rule = rule;
 
         self
@@ -201,7 +202,8 @@ impl Parser {
     /// Set all indent style.
     ///
     /// Currently, this setting is only for list.
-    pub fn indent_style(mut self, style: IndentStyle) -> Self {
+    #[allow(dead_code)]
+    fn indent_style(mut self, style: IndentStyle) -> Self {
         self.list_indent_style = style;
 
         self
