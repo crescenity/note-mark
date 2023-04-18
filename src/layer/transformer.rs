@@ -227,6 +227,7 @@ mod tests {
 
     #[test]
     fn test_transform2() {
+        #[rustfmt::skip]
         // - Hello
         // - World
         //   1. Change the **world**
