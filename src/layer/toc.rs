@@ -161,7 +161,7 @@ mod tests {
         let tree = markdown.parser.parse(input, tokens);
         let mut document = markdown.transformer.transform(tree);
 
-        let toc = MakeToc::default().make_toc(&mut document);
+        let toc = TocMaker::default().make_toc(&mut document);
 
         let output1 = markdown.stringifier.stringify(document);
 
