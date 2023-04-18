@@ -4,7 +4,8 @@ use crate::model::html::*;
 
 pub use config::*;
 
-pub struct MakeToc {
+#[derive(Debug, Clone)]
+pub struct TocMaker {
     level: u8,
     list_type: ListType,
 }
@@ -12,6 +13,7 @@ pub struct MakeToc {
 pub mod config {
     use crate::html::ElementTag;
 
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum ListType {
         Unordered,
         Ordered,
@@ -27,7 +29,7 @@ pub mod config {
     }
 }
 
-impl Default for MakeToc {
+impl Default for TocMaker {
     fn default() -> Self {
         Self {
             level: 3,
@@ -36,14 +38,14 @@ impl Default for MakeToc {
     }
 }
 
-impl MakeToc {
+impl TocMaker {
     pub fn level(mut self, level: u8) -> Self {
         self.level = level;
         self
     }
 }
 
-impl MakeToc {
+impl TocMaker {
     pub fn make_toc<'a>(&self, input: &mut DocumentNode<'a>) -> DocumentNode<'a> {
         let mut list = vec![];
 

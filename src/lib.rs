@@ -10,6 +10,7 @@ pub struct Markdown {
     parser: Parser,
     transformer: Transformer,
     stringifier: Stringifier,
+    toc_maker: TocMaker,
 }
 
 impl Markdown {
@@ -31,6 +32,11 @@ impl Markdown {
         self.stringifier = stringifier;
         self
     }
+
+    pub fn toc_maker(mut self, toc_maker: TocMaker) -> Self {
+        self.toc_maker = toc_maker;
+        self
+    }
 }
 
 impl Markdown {
@@ -50,7 +56,7 @@ impl Markdown {
         let tree = self.parser.parse(input, tokens);
         let mut document = self.transformer.transform(tree);
 
-        let toc = MakeToc::default().make_toc(&mut document);
+        let toc = self.toc_maker.make_toc(&mut document);
 
         (
             self.stringifier.stringify(document),
