@@ -1,5 +1,21 @@
-mod layer;
-mod model;
+//! note-mark is a markdown parser. It is a library that can be used to parse
+//! markdown into HTML.
+//!
+//! # Example
+//!
+//! ```
+//! use note_mark::prelude::*;
+//!
+//! let markdown = Markdown::default();
+//!
+//! let html = markdown.execute("# Hello, world!");
+//!
+//! assert_eq!(html, "<h1>Hello, world!</h1>");
+//!
+//! let html = markdown.execute("# Hello, world!\n\nThis is a paragraph.");
+//!
+//! assert_eq!(html, "<h1>Hello, world!</h1><p>This is a paragraph.</p>");
+//! ```
 
 pub mod layer;
 pub mod model;
