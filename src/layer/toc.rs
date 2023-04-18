@@ -1,18 +1,32 @@
+//! Table of contents.
+//!
+//! This module contains some configuration options for the table of contents.
+
 use std::collections::HashSet;
 
 use crate::model::html::*;
 
 use config::*;
 
+/// The struct to make a table of contents.
 #[derive(Debug, Clone)]
 pub struct TocMaker {
+    /// The maximum level of the table of contents. Default is 3.
     pub level: u8,
+    /// The type of the list. Default is
+    /// [`ListType::Unordered`](config::ListType).
     pub list_type: ListType,
 }
 
 pub mod config {
+    //! Configuration options for the table of contents.
+    //!
+    //! This module contains some configuration options for the table of
+    //! contents.
+
     use crate::model::html::ElementTag;
 
+    /// The type of the list.
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum ListType {
         Unordered,
@@ -39,13 +53,21 @@ impl Default for TocMaker {
 }
 
 impl TocMaker {
+    /// Set the maximum level of the table of contents.
     pub fn level(mut self, level: u8) -> Self {
         self.level = level;
+        self
+    }
+
+    /// Set the type of the list.
+    pub fn list_type(mut self, list_type: ListType) -> Self {
+        self.list_type = list_type;
         self
     }
 }
 
 impl TocMaker {
+    /// Make a table of contents.
     pub fn make_toc<'a>(&self, input: &mut DocumentNode<'a>) -> DocumentNode<'a> {
         let mut list = vec![];
 
