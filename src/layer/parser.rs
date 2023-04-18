@@ -1,17 +1,58 @@
+//! Parser of tokens.
+//!
+//! This module provides a parser of tokens. The parser is implemented as a
+//! recursive descent parser.
+
 use crate::model::{token::*, tree::*};
 use config::*;
 
-/// LR(1) parser
+/// Parser of tokens.
+///
+/// This struct contains configurations for parsing. These configurations are
+/// for supporting various markdown syntax.
+///
+/// # Example
+///
+/// ```
+/// use note_mark::prelude::*;
+///
+/// let parser = Parser::default().headline_ending(HeadlineEnding::SoftBreak);
+///
+/// let markdown = Markdown::default().parser(parser);
+///
+/// let html = markdown.execute("# Hello, world!\nThis is a new line.");
+///
+/// assert_eq!(html, "<h1>Hello, world!</h1><p>This is a new line.</p>");
+///
+/// let parser = Parser::default().headline_ending(HeadlineEnding::HardBreak);
+///
+/// let markdown = Markdown::default().parser(parser);
+///
+/// let html = markdown.execute("# Hello, world!\nThis is a new line.");
+///
+/// assert_eq!(html, "<h1>Hello, world!<br>This is a new line.</h1>");
+/// ```
 #[derive(Debug, Clone)]
 pub struct Parser {
+    /// The end of paragraph is decided by at liest two consecutive line breaks.
+    /// This determines whether to treat the previous sentence as a paragraph if
+    /// the next line is another block element.
     pub paragraph_ending: ParagraphEnding,
+    /// This determines whether to allow a line break in a headline.
     pub headline_ending: HeadlineEnding,
+    /// This determines whether to make the indent rule of list strict or loose.
     pub list_indent_rule: IndentRule,
+    /// This determines whether to make the indent style of list space, tab, or
+    /// both.
     pub list_indent_style: IndentStyle,
 }
 
-/// Configurations for parsing.
 pub mod config {
+    //! Configurations for parsing.
+    //!
+    //! This module provides configurations for parsing. The configurations are
+    //! used in [Parser](super::Parser).
+
     /// Ending of paragraph.
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum ParagraphEnding {
@@ -62,6 +103,28 @@ impl Parser {
     }
 
     /// Set ending of paragraph.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use note_mark::prelude::*;
+    ///
+    /// let parser = Parser::default().paragraph_ending(ParagraphEnding::AllowSoftBreak);
+    ///
+    /// let markdown = Markdown::default().parser(parser);
+    ///
+    /// let html = markdown.execute("Hello, world!\n# This is a new headline.");
+    ///
+    /// assert_eq!(html, "<p>Hello, world!</p><h1>This is a new headline.</h1>");
+    ///
+    /// let parser = Parser::default().paragraph_ending(ParagraphEnding::HardBreak);
+    ///
+    /// let markdown = Markdown::default().parser(parser);
+    ///
+    /// let html = markdown.execute("Hello, world!\n# This is a new headline.");
+    ///
+    /// assert_eq!(html, "<p>Hello, world!<br># This is a new headline.</p>");
+    /// ```
     pub fn paragraph_ending(mut self, ending: ParagraphEnding) -> Self {
         self.paragraph_ending = ending;
 
@@ -69,6 +132,28 @@ impl Parser {
     }
 
     /// Set ending of headline.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use note_mark::prelude::*;
+    ///
+    /// let parser = Parser::default().headline_ending(HeadlineEnding::SoftBreak);
+    ///
+    /// let markdown = Markdown::default().parser(parser);
+    ///
+    /// let html = markdown.execute("# Hello, world!\nThis is a new line.");
+    ///
+    /// assert_eq!(html, "<h1>Hello, world!</h1><p>This is a new line.</p>");
+    ///
+    /// let parser = Parser::default().headline_ending(HeadlineEnding::HardBreak);
+    ///
+    /// let markdown = Markdown::default().parser(parser);
+    ///
+    /// let html = markdown.execute("# Hello, world!\nThis is a new line.");
+    ///
+    /// assert_eq!(html, "<h1>Hello, world!<br>This is a new line.</h1>");
+    /// ```
     pub fn headline_ending(mut self, ending: HeadlineEnding) -> Self {
         self.headline_ending = ending;
 
@@ -76,6 +161,8 @@ impl Parser {
     }
 
     /// Set indent rule of list.
+    ///
+    /// **This config did not work correctly.**
     pub fn list_indent_rule(mut self, rule: IndentRule) -> Self {
         self.list_indent_rule = rule;
 
@@ -83,6 +170,28 @@ impl Parser {
     }
 
     /// Set indent style of list.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use note_mark::prelude::*;
+    ///
+    /// let parser = Parser::default().list_indent_style(IndentStyle::Space(2));
+    ///
+    /// let markdown = Markdown::default().parser(parser);
+    ///
+    /// let html = markdown.execute("- Hello, world!\n  - This is a new line.");
+    ///
+    /// assert_eq!(html, "<ul><li>Hello, world!<ul><li>This is a new line.</li></ul></li></ul>");
+    ///
+    /// let parser = Parser::default().list_indent_style(IndentStyle::Tab);
+    ///
+    /// let markdown = Markdown::default().parser(parser);
+    ///
+    /// let html = markdown.execute("- Hello, world!\n\t- This is a new line.");
+    ///
+    /// assert_eq!(html, "<ul><li>Hello, world!<ul><li>This is a new line.</li></ul></li></ul>");
+    /// ```
     pub fn list_indent_style(mut self, style: IndentStyle) -> Self {
         self.list_indent_style = style;
 
@@ -90,6 +199,8 @@ impl Parser {
     }
 
     /// Set all indent style.
+    ///
+    /// Currently, this setting is only for list.
     pub fn indent_style(mut self, style: IndentStyle) -> Self {
         self.list_indent_style = style;
 
