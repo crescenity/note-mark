@@ -7,6 +7,8 @@ A markdown parser under development.
 
 Please read the [documentation](https://docs.rs/note-mark/).
 
+**Note: This is still a work in progress. Do not use it.**
+
 ## Example
 
 ```toml
