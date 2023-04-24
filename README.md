@@ -13,7 +13,7 @@ Please read the [documentation](https://docs.rs/note-mark/).
 
 ```toml
 [dependencies]
-note_mark = "0.0.2"
+note-mark = "0.0.2"
 ```
 
 ```rust
