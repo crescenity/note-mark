@@ -1370,4 +1370,47 @@ mod tests {
         assert_eq!(item, InlineItem::Break);
         assert_eq!(rest.len(), 1);
     }
+
+    #[test]
+    fn test_issue_25() {
+        let input = "- ";
+        let tokens = lex(input);
+        let parser = Parser::new();
+
+        let tree = parser.parse(input, tokens);
+
+        assert_eq!(
+            tree,
+            MarkdownTree {
+                root: BlockTree {
+                    root: vec![BlockItem::BulletList(ListTree {
+                        root: vec![ListItem {
+                            name: InlineTree { root: vec![] },
+                            children: vec![]
+                        }]
+                    })]
+                }
+            }
+        );
+
+        let input = "-";
+        let tokens = lex(input);
+        let parser = Parser::new();
+
+        let tree = parser.parse(input, tokens);
+
+        assert_eq!(
+            tree,
+            MarkdownTree {
+                root: BlockTree {
+                    root: vec![BlockItem::BulletList(ListTree {
+                        root: vec![ListItem {
+                            name: InlineTree { root: vec![] },
+                            children: vec![]
+                        }]
+                    })]
+                }
+            }
+        );
+    }
 }
