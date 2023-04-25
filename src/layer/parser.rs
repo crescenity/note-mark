@@ -604,10 +604,6 @@ impl<'a, 'b> Executor<'a> {
 
             let (input, new_rest) = self.get_until_maybe_block_item(&rest[2..]);
 
-            if input.is_empty() {
-                break;
-            }
-
             tree.root.push(self.list_item(input));
 
             rest = new_rest;
@@ -663,10 +659,6 @@ impl<'a, 'b> Executor<'a> {
             }
 
             let (input, new_rest) = self.get_until_maybe_block_item(&rest[3..]);
-
-            if input.is_empty() {
-                break;
-            }
 
             tree.root.push(self.list_item(input));
 
