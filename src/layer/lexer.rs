@@ -220,6 +220,13 @@ mod tests {
         assert_eq!(lexer.next().unwrap().kind, TokenKind::Space);
         assert_eq!(lexer.next().unwrap().kind, TokenKind::Text);
         assert_eq!(lexer.next(), None);
+
+        let mut lexer = Lexer::new("あああ");
+
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Text);
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Text);
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Text);
+        assert_eq!(lexer.next(), None);
     }
 
     #[test]
