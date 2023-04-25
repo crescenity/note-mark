@@ -852,6 +852,10 @@ impl<'a, 'b> Executor<'a> {
             return None;
         }
 
+        if tokens.get(1)?.kind == TokenKind::Star {
+            return None;
+        }
+
         let (index, _) = tokens
             .iter()
             .enumerate()
@@ -866,6 +870,10 @@ impl<'a, 'b> Executor<'a> {
     /// Parse tokens to strong item.
     fn strong(&self, tokens: &'b [Token]) -> Option<(InlineItem<'a>, &'b [Token])> {
         if tokens[0].kind != TokenKind::Star || tokens.get(1)?.kind != TokenKind::Star {
+            return None;
+        }
+
+        if tokens.get(2)?.kind == TokenKind::Star {
             return None;
         }
 
@@ -1381,6 +1389,26 @@ mod tests {
                             children: vec![]
                         }]
                     })]
+                }
+            }
+        );
+    }
+
+    #[test]
+    fn test_issue_29() {
+        let input = "***";
+        let tokens = lex(input);
+        let parser = Parser::new();
+
+        let tree = parser.parse(input, tokens);
+
+        assert_eq!(
+            tree,
+            MarkdownTree {
+                root: BlockTree {
+                    root: vec![BlockItem::Paragraph(InlineTree {
+                        root: vec![InlineItem::Text("***".into())]
+                    }),]
                 }
             }
         );
