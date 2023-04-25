@@ -4,7 +4,7 @@
 //! text is joined and non-breakable spaces are removed.
 
 use peekmore::{PeekMore, PeekMoreIterator};
-use std::iter::Peekable;
+use std::{iter::Peekable, str::CharIndices};
 
 use crate::model::token::*;
 
@@ -19,13 +19,14 @@ pub fn lex(input: &'_ str) -> impl Iterator<Item = Token> + '_ {
 }
 
 struct Lexer<'a> {
-    input: &'a str,
-    cursor: usize,
+    chars: Peekable<CharIndices<'a>>,
 }
 
 impl<'a> Lexer<'a> {
     fn new(input: &'a str) -> Self {
-        Self { input, cursor: 0 }
+        Self {
+            chars: input.char_indices().peekable(),
+        }
     }
 }
 
@@ -33,9 +34,7 @@ impl<'a> Iterator for Lexer<'a> {
     type Item = Token;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let mut chars = self.input.char_indices().skip(self.cursor).peekable();
-
-        let (kind, start, len) = if let Some((index, c)) = chars.next() {
+        let (kind, start, len) = if let Some((index, c)) = self.chars.next() {
             let len = c.len_utf8();
 
             let (kind, len) = match c {
@@ -57,14 +56,14 @@ impl<'a> Iterator for Lexer<'a> {
                 '\t' => (TokenKind::Tab, len),
                 '\n' => (TokenKind::Break, len),
                 '\r' => {
-                    if let Some((_, c2)) = chars.next_if(|(_, c2)| c2 == &'\n') {
+                    if let Some((_, c2)) = self.chars.next_if(|(_, c2)| c2 == &'\n') {
                         (TokenKind::Break, len + c2.len_utf8())
                     } else {
                         (TokenKind::Text, len)
                     }
                 }
                 '\\' => {
-                    if let Some((_, c2)) = chars.next_if(|(_, c2)| {
+                    if let Some((_, c2)) = self.chars.next_if(|(_, c2)| {
                         matches!(
                             c2,
                             '#' | '*'
@@ -83,7 +82,6 @@ impl<'a> Iterator for Lexer<'a> {
                                 | '\\'
                         )
                     }) {
-                        self.cursor += len + c2.len_utf8();
                         return Some(Token {
                             kind: TokenKind::Text,
                             start: index + len,
@@ -100,8 +98,6 @@ impl<'a> Iterator for Lexer<'a> {
         } else {
             return None;
         };
-
-        self.cursor += len;
 
         Some(Token { kind, start, len })
     }
